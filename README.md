@@ -1,8 +1,7 @@
 # Triplex
 
 A utility for triple extraction.
-The project is composed of a library **triplex** and a command line tool 
-**triplextraction**. 
+ Extract from csv file obtained using preprocessing [scripts](https://github.com/semlab/tree/master/datasets). 
 
 ## Requirements 
 
