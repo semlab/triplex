@@ -87,32 +87,19 @@ public class Triplextract {
 
    public static void main(String[] args){
        CommandLine cmdArgs = parseArguments(args);
-       
-       
-	//String outputFilePath = "../../data/triples/triples.csv";
-        //String tokensOutputPath = "../../data/tokens.csv";
-          
         try{
             String inputFilePath = cmdArgs.getOptionValue("input");
             CSVReader csvReader = new CSVReader(new FileReader(inputFilePath));
             String outputFilePath = cmdArgs.getOptionValue("output");
-            
             String tokensOutputPath = cmdArgs.hasOption("tokens") ? 
                     cmdArgs.getOptionValue("tokens") : "tokens.txt";
             FileWriter tokensWriter = new FileWriter(tokensOutputPath, true);
-            BufferedWriter tokensBuffer = new BufferedWriter(tokensWriter);
-                
+            BufferedWriter tokensBuffer = new BufferedWriter(tokensWriter);  
             FileWriter outputWriter = new  FileWriter(outputFilePath, true);
             BufferedWriter outputBuffer = new BufferedWriter(outputWriter);
             String csvHeader = String.join("\",\"", Arrays.asList(
-                    "SENTENCE",
-                    "SUBJECT",
-                    "RELATION",
-                    "OBJECT",
-                    "SUBJ_ENT",
-                    "SUBJ_ENT_TYPE",
-                    "OBJ_ENT",
-                    "OBJ_ENT_TYPE"
+                    "SENTENCE","SUBJECT","RELATION","OBJECT","SUBJ_ENT",
+                    "SUBJ_ENT_TYPE","OBJ_ENT","OBJ_ENT_TYPE"
             ));
             outputBuffer.write("\"" + csvHeader +"\"");
             outputBuffer.newLine();
@@ -123,10 +110,10 @@ public class Triplextract {
             props.setProperty("ner.additional.regexner.ignorecase", "true");
             var extractor = new Triplex(entityRules, props);
             int extractionsTotal = 0;
-            
             int articleCount = 0;
             String[] csvLine;
             while((csvLine = csvReader.readNext()) != null){
+                // TODO Read all and parallelize ? 
                 articleCount++;
                 System.out.println("Processing article " + articleCount);
                 //System.out.print("\r");
@@ -141,9 +128,6 @@ public class Triplextract {
                         outputBuffer.flush();
                 }
                 extractionsTotal += extractionsCount;
-                //System.out.print(String.format("Extractions: %d\r",
-                //	extractionsTotal));
-                //docMap = reutersDS.next();
                 if (tokensBuffer != null){
                     var fTokens = extractor.getTokens().stream()
                             .map(String::toLowerCase)
@@ -158,40 +142,6 @@ public class Triplextract {
             outputBuffer.close();
             System.out.println(String.format("Extractions: %d, Completed!",
                     extractionsTotal));
-            //System.out.println(csvLine[1] + " " + csvLine[2]);
-            //System.exit(0);
-            /*
-            Reuters21578 reutersDS = new Reuters21578("../../trace/data/reuters21578sgml", ".sgml");
-            var docMap = reutersDS.next();
-            while(docMap != null){
-                String text = docMap.get("BODY").toString();
-                var extractions = extractor.extract(text);
-                int extractionsCount = extractions.size();
-                if(extractionsCount > 0){
-                        for (var extraction: extractions){
-                                bw.write(extraction.toCSV());
-                                bw.newLine();
-                        }
-                        bw.flush();
-                }
-                extractionsTotal += extractionsCount;
-                //System.out.print(String.format("Extractions: %d\r",
-                //	extractionsTotal));
-                docMap = reutersDS.next();
-                if (tokensBW != null){
-                    var fTokens = extractor.getTokens().stream()
-                            .map(String::toLowerCase)
-                            .filter(t -> t.matches("(\\w\\s?)+"))
-                            .collect(Collectors.toList());
-                    tokensBW.write(String.join(",",fTokens));
-                    tokensBW.newLine();
-                    tokensBW.flush();
-                }
-            }
-            bw.close();
-            System.out.println(String.format("Extractions: %d, Completed!",
-                    extractionsTotal));
-            //*/
         } catch (CsvValidationException e){
             e.printStackTrace();
         } catch (IOException e) {
