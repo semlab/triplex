@@ -89,9 +89,9 @@ public class Triplextract {
             String outputFilePath = cmdArgs.getOptionValue("output");
             String tokensOutputPath = cmdArgs.hasOption("tokens") ? 
                     cmdArgs.getOptionValue("tokens") : "tokens.txt";
-            FileWriter tokensWriter = new FileWriter(tokensOutputPath, true);
+            FileWriter tokensWriter = new FileWriter(tokensOutputPath);
             BufferedWriter tokensBuffer = new BufferedWriter(tokensWriter);  
-            FileWriter outputWriter = new  FileWriter(outputFilePath, true);
+            FileWriter outputWriter = new  FileWriter(outputFilePath);
             BufferedWriter outputBuffer = new BufferedWriter(outputWriter);
             String csvHeader = String.join("\",\"", Arrays.asList(
                     "SENTENCE","SUBJECT","RELATION","OBJECT","SUBJ_ENT",
