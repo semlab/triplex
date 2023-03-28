@@ -44,15 +44,13 @@ public class Triplextract {
         Option help = new Option("h", "help", false, "Print help and usage.");
         help.setRequired(false);
         options.addOption(help);
-      
         // TODO: git gut with better help message https://commons.apache.org/proper/commons-cli/usage.html
         var helpHeader = String.join(
             "USAGE:\n",
-            "\ttriplextract [OPTIONS] [FILE]...",
+            "\ttriplextract [OPTIONS] [FILE]...\n",
             "DESCRIPTION:\n",
             "\tExtract triplets from (text) files.\n"
         );
-
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;//not a good practice, it serves it purpose 
@@ -78,7 +76,6 @@ public class Triplextract {
             formatter.printHelp("triplexdemo", helpHeader, options, "");
             System.exit(0);
         }
-
         return cmd;
     }
 
