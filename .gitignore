@@ -6,5 +6,4 @@
 
 build
 nbproject
-lib
-*.jar
+lib/*.jar
