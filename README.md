@@ -11,6 +11,20 @@ The project rely on the following library:
 * [Apache Commons CLI](https://commons.apache.org/proper/commons-cli) to parse parameters.
 * [opencsv](https://opencsv.sourceforge.net/) and its dependencies to handle csv files
 
+Necessary jars:
+
+* commons-beanutils-1.9.4.jar
+* commons-cli-1.5.0.jar
+* commons-collections4-4.4.jar
+* commons-lang3-3.12.0.jar
+* commons-text-1.10.0.jar
+* opencsv-5.7.1.jar
+* protobuf-java-3.11.4.jar
+* slf4j-api.jar
+* slf4j-simple.jar
+* stanford-corenlp-4.3.2.jar
+* stanford-corenlp-4.3.2-models.jar
+
 ## Usage
 
 For help run:
