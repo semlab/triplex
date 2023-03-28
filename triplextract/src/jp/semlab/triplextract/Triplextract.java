@@ -12,7 +12,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Properties;
 import java.util.stream.Collectors;
-import jp.semlab.triplex.Triplex;
+import jp.semlab.triplex.Extractor;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
@@ -104,7 +104,7 @@ public class Triplextract {
             entityRules.put("COMMODITY", "./data/nerrules/commodities.rules");
             Properties props = new Properties();
             props.setProperty("ner.additional.regexner.ignorecase", "true");
-            var extractor = new Triplex(entityRules, props);
+            var extractor = new Extractor(entityRules, props);
             int extractionsTotal = 0;
             int articleCount = 0;
             String[] csvLine;
