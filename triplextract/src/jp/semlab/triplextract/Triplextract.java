@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Properties;
 import java.util.stream.Collectors;
 import jp.semlab.triplex.Triplex;
-import jp.semlab.triplextract.dataset.Reuters21578;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
 import org.apache.commons.cli.DefaultParser;
