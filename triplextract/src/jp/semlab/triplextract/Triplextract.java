@@ -21,6 +21,9 @@ import org.apache.commons.cli.HelpFormatter;
 import org.apache.commons.cli.Option;
 import org.apache.commons.cli.Options;
 import org.apache.commons.cli.ParseException;
+import com.opencsv.CSVReader;
+import com.opencsv.exceptions.CsvValidationException;
+import java.io.FileReader;
 
 /**
  *
@@ -31,7 +34,7 @@ public class Triplextract {
     private static CommandLine parseArguments(String[] args){
         Options options = new Options();
         Option input = new Option("i", "input", true, "input file path");
-        //input.setRequired(true);
+        input.setRequired(true);
         options.addOption(input);
         Option output = new Option("o", "output", true, "output file");
         output.setRequired(true);
@@ -42,31 +45,38 @@ public class Triplextract {
         Option help = new Option("h", "help", false, "Print help and usage.");
         help.setRequired(false);
         options.addOption(help);
+      
+        // TODO: git gut with better help message https://commons.apache.org/proper/commons-cli/usage.html
+        var helpHeader = String.join(
+            "USAGE:\n",
+            "\ttriplextract [OPTIONS] [FILE]...",
+            "DESCRIPTION:\n",
+            "\tExtract triplets from (text) files.\n"
+        );
 
         CommandLineParser parser = new DefaultParser();
         HelpFormatter formatter = new HelpFormatter();
         CommandLine cmd = null;//not a good practice, it serves it purpose 
         try {
             cmd = parser.parse(options, args);
+            /*
+            if(cmd.getArgList().isEmpty()){
+                throw new ParseException("No input file provided");
+            }
+            //*/
         } catch (ParseException e) {
             System.out.println(e.getMessage());
-            formatter.printHelp("triplexdemo", options);
-
+            formatter.printHelp("triplexdemo", helpHeader, options, "");
             System.exit(1);
-        }       
+        }
+        /*
+        System.out.println("ARg list");
         for (var s: cmd.getArgList()){
             System.out.println(s);
         }
+        //*/
         if (cmd.hasOption(help)){
-            var message = String.join(
-                "USAGE:\n",
-                "\ttriplex source_folder target_folder",
-                "DESCRIPTION:\n",
-                "\tExtract triplets from text files within 'source_folder' and ",
-                "write them as csv files in 'target_folder'.\n",
-                "Note: based on "
-            );
-            formatter.printHelp("triplexdemo", message, options, "");
+            formatter.printHelp("triplexdemo", helpHeader, options, "");
             System.exit(0);
         }
 
@@ -81,20 +91,19 @@ public class Triplextract {
        
 	//String outputFilePath = "../../data/triples/triples.csv";
         //String tokensOutputPath = "../../data/tokens.csv";
-        
-	
-        try {
+          
+        try{
+            String inputFilePath = cmdArgs.getOptionValue("input");
+            CSVReader csvReader = new CSVReader(new FileReader(inputFilePath));
             String outputFilePath = cmdArgs.getOptionValue("output");
-            String tokensOutputPath = null;
-            FileWriter tokensWriter = null;
-            BufferedWriter tokensBW = null;
-            if (cmdArgs.hasOption("tokens")){
-                tokensOutputPath = cmdArgs.getOptionValue("tokens");
-                tokensWriter = new FileWriter(tokensOutputPath, true);
-		tokensBW = new BufferedWriter(tokensWriter);
-            }
-            FileWriter writer = new  FileWriter(outputFilePath, true);
-            BufferedWriter bw = new BufferedWriter(writer);
+            
+            String tokensOutputPath = cmdArgs.hasOption("tokens") ? 
+                    cmdArgs.getOptionValue("tokens") : "tokens.txt";
+            FileWriter tokensWriter = new FileWriter(tokensOutputPath, true);
+            BufferedWriter tokensBuffer = new BufferedWriter(tokensWriter);
+                
+            FileWriter outputWriter = new  FileWriter(outputFilePath, true);
+            BufferedWriter outputBuffer = new BufferedWriter(outputWriter);
             String csvHeader = String.join("\",\"", Arrays.asList(
                     "SENTENCE",
                     "SUBJECT",
@@ -105,15 +114,53 @@ public class Triplextract {
                     "OBJ_ENT",
                     "OBJ_ENT_TYPE"
             ));
-            bw.write("\"" + csvHeader +"\"");
-            bw.newLine();
+            outputBuffer.write("\"" + csvHeader +"\"");
+            outputBuffer.newLine();
 
             var entityRules = new HashMap();
-            entityRules.put("COMMODITY", "../../trace/data/nerrules/commodities.rules");
+            entityRules.put("COMMODITY", "./data/nerrules/commodities.rules");
             Properties props = new Properties();
             props.setProperty("ner.additional.regexner.ignorecase", "true");
             var extractor = new Triplex(entityRules, props);
             int extractionsTotal = 0;
+            
+            int articleCount = 0;
+            String[] csvLine;
+            while((csvLine = csvReader.readNext()) != null){
+                articleCount++;
+                System.out.println("Processing article " + articleCount);
+                //System.out.print("\r");
+                String text = csvLine[0];
+                var extractions = extractor.extract(text);
+                int extractionsCount = extractions.size();
+                if(extractionsCount > 0){
+                        for (var extraction: extractions){
+                                outputBuffer.write(extraction.toCSV());
+                                outputBuffer.newLine();
+                        }
+                        outputBuffer.flush();
+                }
+                extractionsTotal += extractionsCount;
+                //System.out.print(String.format("Extractions: %d\r",
+                //	extractionsTotal));
+                //docMap = reutersDS.next();
+                if (tokensBuffer != null){
+                    var fTokens = extractor.getTokens().stream()
+                            .map(String::toLowerCase)
+                            .filter(t -> t.matches("(\\w\\s?)+"))
+                            .collect(Collectors.toList());
+                    tokensBuffer.write(String.join(",",fTokens));
+                    tokensBuffer.newLine();
+                    tokensBuffer.flush();
+                }
+            }
+            System.out.println(articleCount+ " articles processed!");
+            outputBuffer.close();
+            System.out.println(String.format("Extractions: %d, Completed!",
+                    extractionsTotal));
+            //System.out.println(csvLine[1] + " " + csvLine[2]);
+            //System.exit(0);
+            /*
             Reuters21578 reutersDS = new Reuters21578("../../trace/data/reuters21578sgml", ".sgml");
             var docMap = reutersDS.next();
             while(docMap != null){
@@ -144,8 +191,11 @@ public class Triplextract {
             bw.close();
             System.out.println(String.format("Extractions: %d, Completed!",
                     extractionsTotal));
-	} catch (IOException e) {
-		e.printStackTrace();
+            //*/
+        } catch (CsvValidationException e){
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
 	}
    }
    
