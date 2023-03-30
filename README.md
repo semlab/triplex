@@ -1,7 +1,7 @@
 # Triplex
 
 A utility for triple extraction.
- Extract from csv file obtained using preprocessing [scripts](https://github.com/semlab/tracer/tree/master/datasets). 
+ Extract from csv file obtained using preprocessing [scripts](https://github.com/semlab/tracer/tree/master/datasets) from the [tracer](https://github.com/semlab/tracer/) project.
 
 ## Requirements 
 
