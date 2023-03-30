@@ -1,7 +1,7 @@
 # Triplex
 
 A utility for triple extraction.
- Extract from csv file obtained using preprocessing [scripts](https://github.com/semlab/tree/master/datasets). 
+ Extract from csv file obtained using preprocessing [scripts](https://github.com/semlab/tracer/tree/master/datasets). 
 
 ## Requirements 
 
@@ -11,7 +11,7 @@ The project rely on the following library:
 * [Apache Commons CLI](https://commons.apache.org/proper/commons-cli) to parse parameters.
 * [opencsv](https://opencsv.sourceforge.net/) and its dependencies to handle csv files
 
-Necessary jars:
+Necessary jars libs:
 
 * commons-beanutils-1.9.4.jar
 * commons-cli-1.5.0.jar
