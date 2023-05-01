@@ -38,7 +38,7 @@ public class Triplex {
         output.setRequired(true);
         options.addOption(output);
         Option tkOutput = new Option("t", "tokens", true, "tokens output file");
-        tkOutput.setRequired(false);
+        tkOutput.setRequired(true); // TODO make it optional
         options.addOption(tkOutput);
         Option help = new Option("h", "help", false, "Print help and usage.");
         help.setRequired(false);
@@ -116,11 +116,11 @@ public class Triplex {
                 var extractions = extractor.extract(text);
                 int extractionsCount = extractions.size();
                 if(extractionsCount > 0){
-                        for (var extraction: extractions){
-                                outputBuffer.write(extraction.toCSV());
-                                outputBuffer.newLine();
-                        }
-                        outputBuffer.flush();
+                    for (var extraction: extractions){
+                            outputBuffer.write(extraction.toCSV());
+                            outputBuffer.newLine();
+                    }
+                    outputBuffer.flush();
                 }
                 extractionsTotal += extractionsCount;
                 if (tokensBuffer != null){

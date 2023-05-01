@@ -5,7 +5,9 @@
  */
 package jp.semlab.triplex;
 
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 
 /**
  *
@@ -27,6 +29,10 @@ public class Extraction {
     private String subjectTokens[];
     private String relationTokens[];
     private String objectTokens[];
+    
+    private Boolean isLink = null;
+    private final ArrayList<String> pronouns = new ArrayList<>(Arrays.asList(
+                "he", "she", "it", "they"));
 
     public long getId(){
         return this.id;
@@ -134,6 +140,45 @@ public class Extraction {
     public void setObjecTokens(String objectTokens[]){
         this.objectTokens = objectTokens;
     }
+    
+    /**
+     * Verify if the extraction subject and object are of the same entity type.
+     * @return true if the subject and object entity type are the same false else.
+     */
+    public boolean hasSubjObjSameType(){
+        return this.subjEntType.equals(this.objEntType);
+    }
+    
+    /**
+     * Verify if the subject and object of the extraction contains only named
+     * entities
+     * @return true if subject and object contains only named entities.
+     */
+    public boolean hasEntitiesOnly(){
+        return (subject.equals(subjEnt) && object.equals(objEnt));
+    }
+    
+    
+    /**
+     * Check if the subject or the object is a pronoun.
+     * @return 
+     */
+    public boolean hasPronouns(){
+        return pronouns.contains(subject) || pronouns.contains(object);
+    }
+    
+    
+    /**
+     * is this extraction an entity link
+     * @return 
+     */
+    public boolean isEntityLink(){
+        if (this.isLink == null) {
+            this.isLink = relation.equals("be") && hasSubjObjSameType()
+                && hasPronouns() && hasEntitiesOnly() ; 
+        }
+        return this.isLink;
+    }
 
     @Override
     public boolean equals(Object o){
@@ -150,21 +195,23 @@ public class Extraction {
     public String toCSV(String separator){
         return "\"" 
             + String.join("\"" + separator + "\"", 
-                            Arrays.asList(this.
-                                    sentence,
-                                    subject,
-                                    relation,
-                                    object,
-                                    subjEnt,
-                                    subjEntType,
-                                    objEnt,
-                                    objEntType)) 
+                    Arrays.asList(this.
+                            sentence,
+                            subject,
+                            relation,
+                            object,
+                            subjEnt,
+                            subjEntType,
+                            objEnt,
+                            objEntType)) 
             + "\"";
     }
 
     public String toCSV(){
         return toCSV(",");	
     }
+    
+    
 
     @Override
     public String toString(){
