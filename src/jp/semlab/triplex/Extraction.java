@@ -33,6 +33,24 @@ public class Extraction {
     private Boolean isLink = null;
     private final ArrayList<String> pronouns = new ArrayList<>(Arrays.asList(
                 "he", "she", "it", "they"));
+    
+    public Extraction(){}
+    
+    
+    public Extraction(long id, String sentence, String subject, 
+            String relation, String object, String subjEnt, String subjEntType,
+            String objEnt, String objEntType){
+        this.id = id;
+        this.sentence = sentence;
+        this.subject = subject;
+        this.relation = relation;
+        this.object = object;
+        this.subjEnt = subjEnt;
+        this.subjEntType = subjEntType;
+        this.objEnt = objEnt;
+        this.objEntType = objEntType;
+        
+    }
 
     public long getId(){
         return this.id;
@@ -175,7 +193,7 @@ public class Extraction {
     public boolean isEntityLink(){
         if (this.isLink == null) {
             this.isLink = relation.equals("be") && hasSubjObjSameType()
-                && hasPronouns() && hasEntitiesOnly() ; 
+                && !hasPronouns() && hasEntitiesOnly() ; 
         }
         return this.isLink;
     }
@@ -211,18 +229,21 @@ public class Extraction {
         return toCSV(",");	
     }
     
+    public String toJSON(){
+        return "{\"sentence\": \"" + sentence + "\"\n"
+            + "\"subject\": \"" + subject + "\"\n"
+            + "\"relation\": \"" + relation + "\"\n"
+            + "\"object\": \""  + object + "\"\n"
+            + "\"subjEnt\": \"" + subjEnt +"\"\n"
+            + "\"subjEntType\": \"" + subjEntType + "\"\n"
+            + "\"objEnt\": \"" +  objEnt + "\"\n"
+            + "\"objEntType\": \"" + objEntType + "\"\n}";
+    }
     
 
     @Override
     public String toString(){
-        return "sentence: " + sentence + "\n"
-            + "subject: " + subject + "\n"
-            + "relation: " + relation + "\n"
-            + "object: "  + object + "\n"
-            + "subjEnt: " + subjEnt +"\n"
-            + "subjEntType: " + subjEntType + "\n"
-            + "objEnt: " +  objEnt + "\n"
-            + "objEntType: " + objEntType + "\n";
+        return toString();
     }
 	
 }

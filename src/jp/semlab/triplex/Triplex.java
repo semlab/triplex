@@ -22,6 +22,7 @@ import org.apache.commons.cli.ParseException;
 import com.opencsv.CSVReader;
 import com.opencsv.exceptions.CsvValidationException;
 import java.io.FileReader;
+import java.util.ArrayList;
 
 /**
  *
@@ -43,6 +44,13 @@ public class Triplex {
         Option help = new Option("h", "help", false, "Print help and usage.");
         help.setRequired(false);
         options.addOption(help);
+        Option link = new Option("l", "link", false, "Enable (heuristic) entity linking.");
+        link.setRequired(false);
+        options.addOption(link);
+        Option saveLinks = new Option("L","savelinks", true, "Save entity link extractions."
+            + " Only works if linking is enabled.");
+        link.setRequired(false);
+        options.addOption(saveLinks);
         // TODO: git gut with better help message https://commons.apache.org/proper/commons-cli/usage.html
         var helpHeader = String.join(
             "USAGE:\n",
@@ -81,17 +89,38 @@ public class Triplex {
 
 
    public static void main(String[] args){
+       /*
+       Extraction instance = new Extraction(0, 
+                "The government's National Resistance Army (NRA) closed The main road between Kampala and the Kenya border, Uganda's most important trade artery on Friday after the rebel Holy Spirit Movement of priestess Alice Lakwena reached a village on The main road between Kampala and the Kenya border, Uganda's most important trade artery, said.", 
+                "National Resistance Army", 
+                "be", 
+                "NRA", 
+                "National Resistance Army", 
+                "ORGANIZATION",
+                "NRA", 
+                "ORGANIZATION");
+       System.out.println(instance.hasSubjObjSameType());
+       System.out.println(instance.hasEntitiesOnly());
+       System.out.println(instance.hasPronouns());
+       System.out.println(instance.isEntityLink());
+       System.exit(0);
+       //*/
        CommandLine cmdArgs = parseArguments(args);
         try{
             String inputFilePath = cmdArgs.getOptionValue("input");
             CSVReader csvReader = new CSVReader(new FileReader(inputFilePath));
             String outputFilePath = cmdArgs.getOptionValue("output");
+            boolean isLinkerEnabled = cmdArgs.hasOption("link");
+            String linksOutputPath = cmdArgs.getOptionValue("savelinks");
+            BufferedWriter linksBufferWriter = linksOutputPath == null ? null : 
+                    new BufferedWriter(new FileWriter(linksOutputPath));
+            
             String tokensOutputPath = cmdArgs.hasOption("tokens") ? 
                     cmdArgs.getOptionValue("tokens") : "tokens.txt";
-            FileWriter tokensWriter = new FileWriter(tokensOutputPath);
-            BufferedWriter tokensBuffer = new BufferedWriter(tokensWriter);  
-            FileWriter outputWriter = new  FileWriter(outputFilePath);
-            BufferedWriter outputBuffer = new BufferedWriter(outputWriter);
+            //FileWriter tokensWriter = new FileWriter(tokensOutputPath);
+            BufferedWriter tokensBuffer = new BufferedWriter(new FileWriter(tokensOutputPath));  
+            //FileWriter outputWriter = new  FileWriter(outputFilePath);
+            BufferedWriter outputBuffer = new BufferedWriter(new  FileWriter(outputFilePath));
             String csvHeader = String.join("\",\"", Arrays.asList(
                     "SENTENCE","SUBJECT","RELATION","OBJECT","SUBJ_ENT",
                     "SUBJ_ENT_TYPE","OBJ_ENT","OBJ_ENT_TYPE"
@@ -114,7 +143,26 @@ public class Triplex {
                 //System.out.print("\r");
                 String text = csvLine[0];
                 var extractions = extractor.extract(text);
+                int allExtractionCount = extractions.size();
+                if (isLinkerEnabled){
+                    System.out.println("Link Enabled");
+                    extractions = extractions.stream().filter(
+                            e -> !e.isEntityLink()).collect(Collectors.toList());
+                    if (linksOutputPath != null){
+                        System.out.print("Will write link: ");
+                        //var extractionLinks = extractions.stream()
+                        //        .filter(e -> e.isEntityLink())
+                        //        .collect(Collectors.toList());
+                        String linksStr = extractions.stream()
+                                .filter(e -> e.isEntityLink())
+                                .map(Extraction::toCSV)
+                                .collect(Collectors.joining("\n"));
+                        System.out.println(linksStr);
+                        linksBufferWriter.write(linksStr);
+                    }
+                }
                 int extractionsCount = extractions.size();
+                System.out.println("Extracted: "+ allExtractionCount + ", Kept: " + extractionsCount);
                 if(extractionsCount > 0){
                     for (var extraction: extractions){
                             outputBuffer.write(extraction.toCSV());
