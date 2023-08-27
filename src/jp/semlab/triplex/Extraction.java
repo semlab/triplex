@@ -17,6 +17,7 @@ public class Extraction {
 
 	
     private long id;
+    private String articleId;
     private String sentence;
     private String subject;
     private String relation;
@@ -59,6 +60,14 @@ public class Extraction {
 
     public void setId(long id){
         this.id = id;
+    }
+    
+    public String getArticleId(){
+        return this.articleId;
+    }
+    
+    public void setArticleId(String articleId){
+        this.articleId = articleId;
     }
 
     public String getSentence() {
@@ -213,15 +222,16 @@ public class Extraction {
     public String toCSV(String separator){
         return "\"" 
             + String.join("\"" + separator + "\"", 
-                    Arrays.asList(this.
-                            sentence,
-                            subject,
-                            relation,
-                            object,
-                            subjEnt,
-                            subjEntType,
-                            objEnt,
-                            objEntType)) 
+                    Arrays.asList(
+                            this.articleId,
+                            this.sentence,
+                            this.subject,
+                            this.relation,
+                            this.object,
+                            this.subjEnt,
+                            this.subjEntType,
+                            this.objEnt,
+                            this.objEntType)) 
             + "\"";
     }
 
@@ -230,14 +240,17 @@ public class Extraction {
     }
     
     public String toJSON(){
-        return "{\"sentence\": \"" + sentence + "\"\n"
+        return "{"
+            + "\"articleId\": \"" + articleId + "\"\n"
+            + "\"sentence\": \"" + sentence + "\"\n"
             + "\"subject\": \"" + subject + "\"\n"
             + "\"relation\": \"" + relation + "\"\n"
             + "\"object\": \""  + object + "\"\n"
             + "\"subjEnt\": \"" + subjEnt +"\"\n"
             + "\"subjEntType\": \"" + subjEntType + "\"\n"
             + "\"objEnt\": \"" +  objEnt + "\"\n"
-            + "\"objEntType\": \"" + objEntType + "\"\n}";
+            + "\"objEntType\": \"" + objEntType + "\""
+                + "\n}";
     }
     
 

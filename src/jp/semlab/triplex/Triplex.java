@@ -114,7 +114,6 @@ public class Triplex {
             String linksOutputPath = cmdArgs.getOptionValue("savelinks");
             BufferedWriter linksBufferWriter = linksOutputPath == null ? null : 
                     new BufferedWriter(new FileWriter(linksOutputPath));
-            
             String tokensOutputPath = cmdArgs.hasOption("tokens") ? 
                     cmdArgs.getOptionValue("tokens") : "tokens.txt";
             //FileWriter tokensWriter = new FileWriter(tokensOutputPath);
@@ -143,6 +142,9 @@ public class Triplex {
                 //System.out.print("\r");
                 String text = csvLine[0];
                 var extractions = extractor.extract(text);
+                for (var e: extractions){
+                    e.setArticleId(String.valueOf(articleCount));
+                }
                 int allExtractionCount = extractions.size();
                 if (isLinkerEnabled){
                     System.out.println("Link Enabled");
@@ -160,23 +162,24 @@ public class Triplex {
                         System.out.println(linksStr);
                         linksBufferWriter.write(linksStr);
                     }
+                    System.out.println("Extracted: "+ allExtractionCount + ", Kept: " + extractions.size());
                 }
-                int extractionsCount = extractions.size();
-                System.out.println("Extracted: "+ allExtractionCount + ", Kept: " + extractionsCount);
-                if(extractionsCount > 0){
+                if(extractions.size() > 0){
                     for (var extraction: extractions){
                             outputBuffer.write(extraction.toCSV());
                             outputBuffer.newLine();
                     }
                     outputBuffer.flush();
                 }
-                extractionsTotal += extractionsCount;
+                extractionsTotal += extractions.size();
                 if (tokensBuffer != null){
                     var fTokens = extractor.getTokens().stream()
-                            .map(String::toLowerCase)
                             .filter(t -> t.matches("(\\w\\s?)+"))
+                            .map(String::toLowerCase)
+                            .map(t -> t.replaceAll("\\s", "_")) // word2vec style word phrases
                             .collect(Collectors.toList());
-                    tokensBuffer.write(String.join(",",fTokens));
+                    //tokensBuffer.write(String.join(",",fTokens));
+                    tokensBuffer.write(String.join(" ",fTokens)); // space separator
                     tokensBuffer.newLine();
                     tokensBuffer.flush();
                 }
