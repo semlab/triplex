@@ -121,7 +121,7 @@ public class Triplex {
             //FileWriter outputWriter = new  FileWriter(outputFilePath);
             BufferedWriter outputBuffer = new BufferedWriter(new  FileWriter(outputFilePath));
             String csvHeader = String.join("\",\"", Arrays.asList(
-                    "SENTENCE","SUBJECT","RELATION","OBJECT","SUBJ_ENT",
+                    "Id", "SENTENCE","SUBJECT","RELATION","OBJECT","SUBJ_ENT",
                     "SUBJ_ENT_TYPE","OBJ_ENT","OBJ_ENT_TYPE"
             ));
             outputBuffer.write("\"" + csvHeader +"\"");
