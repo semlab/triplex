@@ -27,6 +27,7 @@ import java.util.ArrayList;
 /**
  *
  * @author gr0259sh
+ * ok
  */
 public class Triplex {
     
