@@ -138,7 +138,7 @@ public class Triplex {
             while((csvLine = csvReader.readNext()) != null){
                 // TODO Read all and parallelize ? 
                 articleCount++;
-                System.out.println("Processing article " + articleCount);
+                System.out.println("Processing article " + articleCount + "\r");
                 //System.out.print("\r");
                 String text = csvLine[0];
                 var extractions = extractor.extract(text);
