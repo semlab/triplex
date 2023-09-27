@@ -59,17 +59,10 @@ public class Extractor {
 
 
     private void init(Map entityRules, Properties additionalProps){
-        //*
         Properties props = new Properties();
         props.setProperty("annotators", 
                     "tokenize,ssplit,pos,lemma,depparse,ner,natlog,openie");
-        //*/
-        /*
-        Properties props = PropertiesUtils.asProperties(
-            "annotators", "tokenize,ssplit,pos,lemma,ner,parse,mention,coref",
-            "coref.algorithm", "neural"
-        );
-        //*/
+
         this.entitiesType = new ArrayList<String>();
         this.entitiesType.add("PERSON");
         this.entitiesType.add("ORGANIZATION");
@@ -84,9 +77,7 @@ public class Extractor {
             props.setProperty("ner.additional.regexner.mapping", 
                     (String) entityRules.get(key));
         });
-        //*/
         this.pipeline = new StanfordCoreNLP(props);
-
         this.retokenizer = new EntityTokenizer();
     }
 
