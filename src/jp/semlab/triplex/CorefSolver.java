@@ -66,11 +66,7 @@ public class CorefSolver {
             Map<Integer, List<String>> solvedSentences){
         List<String> sentences = new ArrayList();
         for (CoreMap sentence: coreSentences){
-            System.out.println(sentence.toString());
             var sentIndex = sentence.get(CoreAnnotations.SentenceIndexAnnotation.class);
-            var sentPos = sentence.get(CoreAnnotations.SentencePositionAnnotation.class);
-            System.out.println("Index= "+ sentIndex + ", Pos= " 
-                    + sentPos  + " " + sentence.get(CoreAnnotations.TextAnnotation.class));
             if(solvedSentences.containsKey(sentIndex)){
                 List<String> sentWords = solvedSentences.get(sentIndex);
                 sentences.add(String.join(" ", sentWords));

@@ -104,6 +104,8 @@ public class Triplex {
             BufferedWriter tokensBuffer = new BufferedWriter(new FileWriter(tokensOutputPath));  
             //FileWriter outputWriter = new  FileWriter(outputFilePath);
             BufferedWriter outputBuffer = new BufferedWriter(new  FileWriter(outputFilePath));
+            
+
             String csvHeader = String.join("\",\"", Arrays.asList(
                     "Id", "SENTENCE","SUBJECT","RELATION","OBJECT","SUBJ_ENT",
                     "SUBJ_ENT_TYPE","OBJ_ENT","OBJ_ENT_TYPE"
@@ -115,6 +117,7 @@ public class Triplex {
             entityRules.put("COMMODITY", "./data/nerrules/commodities.rules");
             Properties props = new Properties();
             props.setProperty("ner.additional.regexner.ignorecase", "true");
+            var corefSolver = new CorefSolver();
             var extractor = new Extractor(entityRules, props);
             int extractionsTotal = 0;
             int articleCount = 0;
@@ -122,9 +125,11 @@ public class Triplex {
             while((csvLine = csvReader.readNext()) != null){
                 // TODO Read all and parallelize ? 
                 articleCount++;
-                System.out.println("Processing article " + articleCount + "\r");
-                //System.out.print("\r");
-                String text = csvLine[0];
+                String rawText = csvLine[0];
+                System.out.print("\rProcessing article " + articleCount + ": ");
+                System.out.print("...solving coref, ");
+                String text = corefSolver.solveCoref(rawText);
+                System.out.print("...extracting triples.");
                 var extractions = extractor.extract(text);
                 for (var e: extractions){
                     e.setArticleId(String.valueOf(articleCount));
@@ -168,10 +173,12 @@ public class Triplex {
                     tokensBuffer.flush();
                 }
             }
+            System.out.println();
             System.out.println(articleCount+ " articles processed!");
             outputBuffer.close();
             System.out.println(String.format("Extractions: %d, Completed!",
                     extractionsTotal));
+            //***
         } catch (CsvValidationException e){
             e.printStackTrace();
         } catch (IOException e) {
