@@ -89,22 +89,6 @@ public class Triplex {
 
 
    public static void main(String[] args){
-       /*
-       Extraction instance = new Extraction(0, 
-                "The government's National Resistance Army (NRA) closed The main road between Kampala and the Kenya border, Uganda's most important trade artery on Friday after the rebel Holy Spirit Movement of priestess Alice Lakwena reached a village on The main road between Kampala and the Kenya border, Uganda's most important trade artery, said.", 
-                "National Resistance Army", 
-                "be", 
-                "NRA", 
-                "National Resistance Army", 
-                "ORGANIZATION",
-                "NRA", 
-                "ORGANIZATION");
-       System.out.println(instance.hasSubjObjSameType());
-       System.out.println(instance.hasEntitiesOnly());
-       System.out.println(instance.hasPronouns());
-       System.out.println(instance.isEntityLink());
-       System.exit(0);
-       //*/
        CommandLine cmdArgs = parseArguments(args);
         try{
             String inputFilePath = cmdArgs.getOptionValue("input");

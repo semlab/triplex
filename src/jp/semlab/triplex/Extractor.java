@@ -13,6 +13,7 @@ import edu.stanford.nlp.naturalli.NaturalLogicAnnotations;
 import edu.stanford.nlp.pipeline.Annotation;
 import edu.stanford.nlp.pipeline.StanfordCoreNLP;
 import edu.stanford.nlp.util.CoreMap;
+import edu.stanford.nlp.util.PropertiesUtils;
 import java.io.FileWriter;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -58,13 +59,22 @@ public class Extractor {
 
 
     private void init(Map entityRules, Properties additionalProps){
+        //*
         Properties props = new Properties();
         props.setProperty("annotators", 
                     "tokenize,ssplit,pos,lemma,depparse,ner,natlog,openie");
+        //*/
+        /*
+        Properties props = PropertiesUtils.asProperties(
+            "annotators", "tokenize,ssplit,pos,lemma,ner,parse,mention,coref",
+            "coref.algorithm", "neural"
+        );
+        //*/
         this.entitiesType = new ArrayList<String>();
         this.entitiesType.add("PERSON");
-        this.entitiesType.add("LOCATION");
         this.entitiesType.add("ORGANIZATION");
+        //* Comment to only keep Person and orgs // TODO Parametrize
+        this.entitiesType.add("LOCATION");
         // add additional rules, customize TokensRegexNER annotator
         additionalProps.keySet().forEach(key -> {
             props.setProperty((String) key, additionalProps.getProperty((String) key));
@@ -74,6 +84,7 @@ public class Extractor {
             props.setProperty("ner.additional.regexner.mapping", 
                     (String) entityRules.get(key));
         });
+        //*/
         this.pipeline = new StanfordCoreNLP(props);
 
         this.retokenizer = new EntityTokenizer();
