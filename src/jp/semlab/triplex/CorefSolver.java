@@ -86,7 +86,13 @@ public class CorefSolver {
      */
     public String solveCoref(String text){
         Annotation document = new Annotation(text);
-        pipeline.annotate(document);
+        try{
+            pipeline.annotate(document);
+        } catch(OutOfMemoryError ex){
+            System.out.println("\n\tSkipping Coreference(Annotation Out of Memory)");
+            return text;
+        }
+        
         
         List<CoreMap> coreSentences = document.get(CoreAnnotations.SentencesAnnotation.class);
         Map<Integer, List<Mention>> mentionsByClusterID = groupMentions(coreSentences);

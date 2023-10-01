@@ -135,6 +135,7 @@ public class Triplex {
                     e.setArticleId(String.valueOf(articleCount));
                 }
                 int allExtractionCount = extractions.size();
+                /*
                 if (isLinkerEnabled){
                     System.out.println("Link Enabled");
                     extractions = extractions.stream().filter(
@@ -153,6 +154,7 @@ public class Triplex {
                     }
                     System.out.println("Extracted: "+ allExtractionCount + ", Kept: " + extractions.size());
                 }
+                //*/
                 if(extractions.size() > 0){
                     for (var extraction: extractions){
                             outputBuffer.write(extraction.toCSV());
